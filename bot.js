@@ -28,8 +28,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         var args = message.substring(1).split(' ');
         var cmd = args[0];
        
-        args = args.splice(1);
-        switch(cmd) {
+        logger.info(cmd.toLowerCase());
+        switch(cmd.toLowerCase()) {
             // !ping
             case 'ping':
                 bot.sendMessage({
@@ -37,7 +37,27 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     message: 'Pong!'
                 });
             break;
+            default: logger.info(cmd
+            );
+        break;
+        case 'name':
+                bot.sendMessage({
+                    to: channelID,
+                    message: user
+                });
+            break;
+            case 'add':
+            var number= addFive(args[1]); 
+            bot.sendMessage({
+                    to: channelID,
+                    message: number
+                });
+            break;
             // Just add any case commands if you want to.
          }
      }
 });
+function addFive(p1 ) {
+    p1=parseInt(p1)
+    return p1 + 5 ; 
+  }
