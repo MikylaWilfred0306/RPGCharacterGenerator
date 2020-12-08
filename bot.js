@@ -34,30 +34,51 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             case 'ping':
                 bot.sendMessage({
                     to: channelID,
-                    message: 'Pong!'
+                    message: 'Pong! <@' + userID + '>'
                 });
-            break;
-            default: logger.info(cmd
-            );
-        break;
-        case 'name':
+                break;
+            default: 
+                logger.info(cmd);
+                break;
+            case 'name':
                 bot.sendMessage({
                     to: channelID,
-                    message: user
+                    message: user + ' <@' + userID + '>'
                 });
-            break;
+                break;
             case 'add':
-            var number= addFive(args[1]); 
-            bot.sendMessage({
+                var number= addFive(args[1]); 
+                bot.sendMessage({
+                        to: channelID,
+                        message: number + ' <@' + userID + '>'
+                    });
+                break;
+            // Strength: randomNumber
+            // DEXTERITY: random
+            // Constitution: random
+            // INTELLIGENCE
+            // WISDOM
+            // CHARISMA
+            case 'stats': 
+                bot.sendMessage({
                     to: channelID,
-                    message: number
+                    message: randomize() + '\n <@' + userID + '>'
                 });
-            break;
-            // Just add any case commands if you want to.
          }
      }
 });
 function addFive(p1 ) {
     p1=parseInt(p1)
     return p1 + 5 ; 
-  }
+}
+
+//.3645
+function randomize(){
+    let randomNumber = Math.random();
+    randomNumber = randomNumber * 10; //3.645
+    if(randomNumber < 8) { //true
+        randomNumber = randomNumber + 10; //13.645
+    }
+    randomNumber = Math.round(randomNumber); //14
+    return randomNumber;
+}
