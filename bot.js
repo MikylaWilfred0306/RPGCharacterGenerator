@@ -43,14 +43,14 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             case 'name':
                 bot.sendMessage({
                     to: channelID,
-                    message: user + ' <@' + userID + '>'
+                    message: user + '\n <@' + userID + '>'
                 });
                 break;
             case 'add':
                 var number= addFive(args[1]); 
                 bot.sendMessage({
                         to: channelID,
-                        message: number + ' <@' + userID + '>'
+                        message: number + '\n <@' + userID + '>'
                     });
                 break;
             // Strength: randomNumber
@@ -62,7 +62,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             case 'stats': 
                 bot.sendMessage({
                     to: channelID,
-                    message: randomize() + '\n <@' + userID + '>'
+                    message: 'Strength: ' + randomize() + '\n' + 'Dexterity: ' + randomize() + '\n' + 'Constitution: ' + randomize() + '\n' + 'Intelligence: ' + randomize() + '\n' + 'Wisdom: ' + randomize() + '\n' + 'Charisma: ' + randomize() + '\n <@' + userID + '>'
                 });
          }
      }
