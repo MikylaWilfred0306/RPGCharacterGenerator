@@ -53,16 +53,55 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         message: number + '\n <@' + userID + '>'
                     });
                 break;
-            // Strength: randomNumber
-            // DEXTERITY: random
-            // Constitution: random
-            // INTELLIGENCE
-            // WISDOM
-            // CHARISMA
-            case 'stats': 
+            case 'stats':
+                let statsObject = {
+                    BaseStats: {
+                        Strength: randomize(),
+                        Dexterity: randomize(),
+                        Constitution: randomize(),
+                        Intelligence: randomize(),
+                        Wisdom: randomize(),
+                        Charisma: randomize(),
+                    },
+                    AbilityScores: {},
+                    Skills: {}
+                }; 
+                
+                //AbilityScores
+                statsObject.AbilityScores.Strength = calcAbility(statsObject.BaseStats.Strength);
+                statsObject.AbilityScores.Dexterity = calcAbility(statsObject.BaseStats.Dexterity);
+                statsObject.AbilityScores.Constitution = calcAbility(statsObject.BaseStats.Constitution);
+                statsObject.AbilityScores.Intelligence = calcAbility(statsObject.BaseStats.Intelligence);
+                statsObject.AbilityScores.Wisdom = calcAbility(statsObject.BaseStats.Wisdom);
+                statsObject.AbilityScores.Charisma = calcAbility(statsObject.BaseStats.Charisma);
+
+                //Skills
+                statsObject.Skills.Athletics =  statsObject.AbilityScores.Strength;
+
+                statsObject.Skills.Acrobatics =  statsObject.AbilityScores.Dexterity;
+                statsObject.Skills.SleightOfHand =  statsObject.AbilityScores.Dexterity;
+                statsObject.Skills.Stealth =  statsObject.AbilityScores.Dexterity;
+
+                statsObject.Skills.Arcana =  statsObject.AbilityScores.Intelligence;
+                statsObject.Skills.History =  statsObject.AbilityScores.Intelligence;
+                statsObject.Skills.Investigation =  statsObject.AbilityScores.Intelligence;
+                statsObject.Skills.Nature =  statsObject.AbilityScores.Intelligence;
+                statsObject.Skills.Religion =  statsObject.AbilityScores.Intelligence;
+                
+                statsObject.Skills.AnimalHandling =  statsObject.AbilityScores.Wisdom;
+                statsObject.Skills.Insight =  statsObject.AbilityScores.Wisdom;
+                statsObject.Skills.Medicine =  statsObject.AbilityScores.Wisdom;
+                statsObject.Skills.Perception =  statsObject.AbilityScores.Wisdom;
+                statsObject.Skills.Survival =  statsObject.AbilityScores.Wisdom;
+                
+                statsObject.Skills.Deception =  statsObject.AbilityScores.Charisma;
+                statsObject.Skills.Intimidation =  statsObject.AbilityScores.Charisma;
+                statsObject.Skills.Performance =  statsObject.AbilityScores.Charisma;
+                statsObject.Skills.Persuasion =  statsObject.AbilityScores.Charisma;
+
                 bot.sendMessage({
                     to: channelID,
-                    message: 'Strength: ' + randomize() + '\n' + 'Dexterity: ' + randomize() + '\n' + 'Constitution: ' + randomize() + '\n' + 'Intelligence: ' + randomize() + '\n' + 'Wisdom: ' + randomize() + '\n' + 'Charisma: ' + randomize() + '\n <@' + userID + '>'
+                    message: JSON.stringify(statsObject, null, 4) + '\n <@' + userID + '>'
                 });
          }
      }
@@ -81,4 +120,44 @@ function randomize(){
     }
     randomNumber = Math.round(randomNumber); //14
     return randomNumber;
+}
+
+
+// Ability Score Function 
+function calcAbility(baseStat){
+    let modifier = 0;
+    if(baseStat == 1){
+        modifier = -5;
+    }
+    else if (baseStat == 2 || baseStat ==  3){
+        modifier = -4;
+    }
+    else if (baseStat == 4 || baseStat ==  5){
+        modifier = -3;
+    }
+    else if (baseStat == 6 || baseStat ==  7){
+        modifier = -2;
+    }
+    else if (baseStat == 8 || baseStat ==  9){
+        modifier = -1;
+    }
+    else if (baseStat == 10 || baseStat ==  11){
+        modifier = 0;
+    }    
+    else if (baseStat == 12 || baseStat ==  13){
+        modifier = 1;
+    }    
+    else if (baseStat == 14 || baseStat ==  15){
+        modifier = 2;
+    }
+    else if (baseStat == 16 || baseStat ==  17){
+        modifier = 3;
+    }
+    else if (baseStat == 18 || baseStat ==  19){
+        modifier = 4;
+    }
+    else if (baseStat == 20){
+        modifier = 5;
+    }
+    return modifier;
 }
