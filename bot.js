@@ -1,6 +1,7 @@
 var Discord = require('discord.io');
 var logger = require('winston');
 var auth = require('./auth.json');
+var axios = require('axios');
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
@@ -54,55 +55,14 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     });
                 break;
             case 'stats':
-                let statsObject = {
-                    BaseStats: {
-                        Strength: randomize(),
-                        Dexterity: randomize(),
-                        Constitution: randomize(),
-                        Intelligence: randomize(),
-                        Wisdom: randomize(),
-                        Charisma: randomize(),
-                    },
-                    AbilityScores: {},
-                    Skills: {}
-                }; 
-                
-                //AbilityScores
-                statsObject.AbilityScores.Strength = calcAbility(statsObject.BaseStats.Strength);
-                statsObject.AbilityScores.Dexterity = calcAbility(statsObject.BaseStats.Dexterity);
-                statsObject.AbilityScores.Constitution = calcAbility(statsObject.BaseStats.Constitution);
-                statsObject.AbilityScores.Intelligence = calcAbility(statsObject.BaseStats.Intelligence);
-                statsObject.AbilityScores.Wisdom = calcAbility(statsObject.BaseStats.Wisdom);
-                statsObject.AbilityScores.Charisma = calcAbility(statsObject.BaseStats.Charisma);
-
-                //Skills
-                statsObject.Skills.Athletics =  statsObject.AbilityScores.Strength;
-
-                statsObject.Skills.Acrobatics =  statsObject.AbilityScores.Dexterity;
-                statsObject.Skills.SleightOfHand =  statsObject.AbilityScores.Dexterity;
-                statsObject.Skills.Stealth =  statsObject.AbilityScores.Dexterity;
-
-                statsObject.Skills.Arcana =  statsObject.AbilityScores.Intelligence;
-                statsObject.Skills.History =  statsObject.AbilityScores.Intelligence;
-                statsObject.Skills.Investigation =  statsObject.AbilityScores.Intelligence;
-                statsObject.Skills.Nature =  statsObject.AbilityScores.Intelligence;
-                statsObject.Skills.Religion =  statsObject.AbilityScores.Intelligence;
-                
-                statsObject.Skills.AnimalHandling =  statsObject.AbilityScores.Wisdom;
-                statsObject.Skills.Insight =  statsObject.AbilityScores.Wisdom;
-                statsObject.Skills.Medicine =  statsObject.AbilityScores.Wisdom;
-                statsObject.Skills.Perception =  statsObject.AbilityScores.Wisdom;
-                statsObject.Skills.Survival =  statsObject.AbilityScores.Wisdom;
-                
-                statsObject.Skills.Deception =  statsObject.AbilityScores.Charisma;
-                statsObject.Skills.Intimidation =  statsObject.AbilityScores.Charisma;
-                statsObject.Skills.Performance =  statsObject.AbilityScores.Charisma;
-                statsObject.Skills.Persuasion =  statsObject.AbilityScores.Charisma;
-
-                bot.sendMessage({
-                    to: channelID,
-                    message: JSON.stringify(statsObject, null, 4) + '\n <@' + userID + '>'
-                });
+                stats(channelID, userID);
+                break;
+            case 'class':
+                apiCall(channelID, userID, args[1]);
+                break;
+            case 'race':
+                    apiCallDragonborn(channelID, userID, args[1]);
+                break;
          }
      }
 });
@@ -161,3 +121,137 @@ function calcAbility(baseStat){
     }
     return modifier;
 }
+
+function stats(channelID, userID){
+    let statsObject = {
+        BaseStats: {
+            Strength: randomize(),
+            Dexterity: randomize(),
+            Constitution: randomize(),
+            Intelligence: randomize(),
+            Wisdom: randomize(),
+            Charisma: randomize(),
+        },
+        AbilityScores: {},
+        Skills: {}
+    }; 
+    
+    //AbilityScores
+    statsObject.AbilityScores.Strength = calcAbility(statsObject.BaseStats.Strength);
+    statsObject.AbilityScores.Dexterity = calcAbility(statsObject.BaseStats.Dexterity);
+    statsObject.AbilityScores.Constitution = calcAbility(statsObject.BaseStats.Constitution);
+    statsObject.AbilityScores.Intelligence = calcAbility(statsObject.BaseStats.Intelligence);
+    statsObject.AbilityScores.Wisdom = calcAbility(statsObject.BaseStats.Wisdom);
+    statsObject.AbilityScores.Charisma = calcAbility(statsObject.BaseStats.Charisma);
+
+    //Skills
+    statsObject.Skills.Athletics =  statsObject.AbilityScores.Strength;
+
+    statsObject.Skills.Acrobatics =  statsObject.AbilityScores.Dexterity;
+    statsObject.Skills.SleightOfHand =  statsObject.AbilityScores.Dexterity;
+    statsObject.Skills.Stealth =  statsObject.AbilityScores.Dexterity;
+
+    statsObject.Skills.Arcana =  statsObject.AbilityScores.Intelligence;
+    statsObject.Skills.History =  statsObject.AbilityScores.Intelligence;
+    statsObject.Skills.Investigation =  statsObject.AbilityScores.Intelligence;
+    statsObject.Skills.Nature =  statsObject.AbilityScores.Intelligence;
+    statsObject.Skills.Religion =  statsObject.AbilityScores.Intelligence;
+    
+    statsObject.Skills.AnimalHandling =  statsObject.AbilityScores.Wisdom;
+    statsObject.Skills.Insight =  statsObject.AbilityScores.Wisdom;
+    statsObject.Skills.Medicine =  statsObject.AbilityScores.Wisdom;
+    statsObject.Skills.Perception =  statsObject.AbilityScores.Wisdom;
+    statsObject.Skills.Survival =  statsObject.AbilityScores.Wisdom;
+    
+    statsObject.Skills.Deception =  statsObject.AbilityScores.Charisma;
+    statsObject.Skills.Intimidation =  statsObject.AbilityScores.Charisma;
+    statsObject.Skills.Performance =  statsObject.AbilityScores.Charisma;
+    statsObject.Skills.Persuasion =  statsObject.AbilityScores.Charisma;
+
+    bot.sendMessage({
+        to: channelID,
+        message: JSON.stringify(statsObject, null, 4) + '\n <@' + userID + '>'
+    });
+}
+
+function apiCall(channelID, userID, className){
+    axios.get('https://www.dnd5eapi.co/api/classes/' + className)
+        .then(res => {
+            var returnMessage = "";
+            var savingThrowsInfo = res.data.saving_throws;
+            var stLen = savingThrowsInfo.length;
+
+    for (var i = 0; i < stLen; i++) {
+    switch(savingThrowsInfo[i].name){
+    case "DEX":
+    returnMessage = returnMessage + "Dexterity, "
+    break;
+
+    case "CHA":
+    returnMessage = returnMessage + "Charisma, "
+    break;
+
+    case "CON":
+    returnMessage = returnMessage + "Consitution, "
+    break;
+
+    case "INT":
+    returnMessage = returnMessage + "Intelligence, "
+    break;
+
+    case "STR":
+    returnMessage = returnMessage + "Strength, "
+    break;
+
+    case "WIS":
+    returnMessage = returnMessage + "Wisdom, "
+    break;
+ }
+}
+
+
+            bot.sendMessage({
+                to: channelID,
+                message: JSON.stringify(returnMessage, null, 4) + " <@" + userID + ">",
+            })})}
+
+function apiCallDragonborn(channelID, userID, raceName){
+    axios.get('https://www.dnd5eapi.co/api/races/' + raceName)
+        .then(res => {
+            var returnMessage = "";
+            var ability_bonuses = res.data.ability_bonuses;
+            var stLen = ability_bonuses.length;
+            for (var i = 0; i < stLen; i++) {
+                returnMessage = returnMessage + ability_bonuses[i].bonus + " "
+                switch(ability_bonuses[i].ability_score.name){
+                    case "DEX":
+    returnMessage = returnMessage + "Dexterity, "
+    break;
+
+    case "CHA":
+    returnMessage = returnMessage + "Charisma, "
+    break;
+
+    case "CON":
+    returnMessage = returnMessage + "Consitution, "
+    break;
+
+    case "INT":
+    returnMessage = returnMessage + "Intelligence, "
+    break;
+
+    case "STR":
+    returnMessage = returnMessage + "Strength, "
+    break;
+
+    case "WIS":
+    returnMessage = returnMessage + "Wisdom, "
+    break;
+ }
+}
+
+            bot.sendMessage({
+                to: channelID,
+                message: JSON.stringify(returnMessage, null, 4) + " <@" + userID + ">",
+            })})}   
+
