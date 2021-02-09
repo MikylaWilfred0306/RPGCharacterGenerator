@@ -55,13 +55,13 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     });
                 break;
             case 'stats':
-                stats(channelID, userID);
+                stats(channelID, userID, args[1], args[2]);
                 break;
             case 'class':
-                apiCall(channelID, userID, args[1]);
+                apiCallSavingThrows(channelID, userID, args[1]);
                 break;
             case 'race':
-                    apiCallDragonborn(channelID, userID, args[1]);
+                    apiCallRace(channelID, userID, args[1]);
                 break;
          }
      }
@@ -122,8 +122,10 @@ function calcAbility(baseStat){
     return modifier;
 }
 
-function stats(channelID, userID){
+function stats(channelID, userID, raceName, className){
     let statsObject = {
+        Race: raceName,
+        Class: className,
         BaseStats: {
             Strength: randomize(),
             Dexterity: randomize(),
@@ -174,7 +176,7 @@ function stats(channelID, userID){
     });
 }
 
-function apiCall(channelID, userID, className){
+function apiCallSavingThrows(channelID, userID, className){
     axios.get('https://www.dnd5eapi.co/api/classes/' + className)
         .then(res => {
             var returnMessage = "";
@@ -182,31 +184,7 @@ function apiCall(channelID, userID, className){
             var stLen = savingThrowsInfo.length;
 
     for (var i = 0; i < stLen; i++) {
-    switch(savingThrowsInfo[i].name){
-    case "DEX":
-    returnMessage = returnMessage + "Dexterity, "
-    break;
-
-    case "CHA":
-    returnMessage = returnMessage + "Charisma, "
-    break;
-
-    case "CON":
-    returnMessage = returnMessage + "Consitution, "
-    break;
-
-    case "INT":
-    returnMessage = returnMessage + "Intelligence, "
-    break;
-
-    case "STR":
-    returnMessage = returnMessage + "Strength, "
-    break;
-
-    case "WIS":
-    returnMessage = returnMessage + "Wisdom, "
-    break;
- }
+        returnMessage = returnMessage + getBonuses(savingThrowsInfo[i].name)
 }
 
 
@@ -215,7 +193,7 @@ function apiCall(channelID, userID, className){
                 message: JSON.stringify(returnMessage, null, 4) + " <@" + userID + ">",
             })})}
 
-function apiCallDragonborn(channelID, userID, raceName){
+function apiCallRace(channelID, userID, raceName){
     axios.get('https://www.dnd5eapi.co/api/races/' + raceName)
         .then(res => {
             var returnMessage = "";
@@ -223,35 +201,37 @@ function apiCallDragonborn(channelID, userID, raceName){
             var stLen = ability_bonuses.length;
             for (var i = 0; i < stLen; i++) {
                 returnMessage = returnMessage + ability_bonuses[i].bonus + " "
-                switch(ability_bonuses[i].ability_score.name){
-                    case "DEX":
-    returnMessage = returnMessage + "Dexterity, "
-    break;
-
-    case "CHA":
-    returnMessage = returnMessage + "Charisma, "
-    break;
-
-    case "CON":
-    returnMessage = returnMessage + "Consitution, "
-    break;
-
-    case "INT":
-    returnMessage = returnMessage + "Intelligence, "
-    break;
-
-    case "STR":
-    returnMessage = returnMessage + "Strength, "
-    break;
-
-    case "WIS":
-    returnMessage = returnMessage + "Wisdom, "
-    break;
- }
+                returnMessage = returnMessage + getBonuses(ability_bonuses[i].ability_score.name)
 }
 
             bot.sendMessage({
                 to: channelID,
                 message: JSON.stringify(returnMessage, null, 4) + " <@" + userID + ">",
             })})}   
+
+            function getBonuses(statType){
+                switch(statType){
+    case "DEX":
+    return "Dexterity, "
+
+    case "CHA":
+    return "Charisma, "
+    
+    case "CON":
+    return "Consitution, "
+ 
+
+    case "INT":
+    return "Intelligence, "
+  
+
+    case "STR":
+    return  "Strength, "
+  
+
+    case "WIS":
+    return "Wisdom, "
+    
+ }
+            }
 
