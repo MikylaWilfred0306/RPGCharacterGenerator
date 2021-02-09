@@ -57,12 +57,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             case 'stats':
                 stats(channelID, userID, args[1], args[2]);
                 break;
-            case 'class':
-                apiCallSavingThrows(channelID, userID, args[1]);
-                break;
-            case 'race':
-                    apiCallRace(channelID, userID, args[1]);
-                break;
          }
      }
 });
@@ -139,44 +133,15 @@ function stats(channelID, userID, raceName, className){
     }; 
     
     //AbilityScores
-    statsObject.AbilityScores.Strength = calcAbility(statsObject.BaseStats.Strength);
-    statsObject.AbilityScores.Dexterity = calcAbility(statsObject.BaseStats.Dexterity);
-    statsObject.AbilityScores.Constitution = calcAbility(statsObject.BaseStats.Constitution);
-    statsObject.AbilityScores.Intelligence = calcAbility(statsObject.BaseStats.Intelligence);
-    statsObject.AbilityScores.Wisdom = calcAbility(statsObject.BaseStats.Wisdom);
-    statsObject.AbilityScores.Charisma = calcAbility(statsObject.BaseStats.Charisma);
+    statsObject = calcSavingThrows(statsObject)
 
     //Skills
-    statsObject.Skills.Athletics =  statsObject.AbilityScores.Strength;
+    statsObject = calcSkills(statsObject)
+    apiCallClass(channelID, userID, className, statsObject);
 
-    statsObject.Skills.Acrobatics =  statsObject.AbilityScores.Dexterity;
-    statsObject.Skills.SleightOfHand =  statsObject.AbilityScores.Dexterity;
-    statsObject.Skills.Stealth =  statsObject.AbilityScores.Dexterity;
-
-    statsObject.Skills.Arcana =  statsObject.AbilityScores.Intelligence;
-    statsObject.Skills.History =  statsObject.AbilityScores.Intelligence;
-    statsObject.Skills.Investigation =  statsObject.AbilityScores.Intelligence;
-    statsObject.Skills.Nature =  statsObject.AbilityScores.Intelligence;
-    statsObject.Skills.Religion =  statsObject.AbilityScores.Intelligence;
-    
-    statsObject.Skills.AnimalHandling =  statsObject.AbilityScores.Wisdom;
-    statsObject.Skills.Insight =  statsObject.AbilityScores.Wisdom;
-    statsObject.Skills.Medicine =  statsObject.AbilityScores.Wisdom;
-    statsObject.Skills.Perception =  statsObject.AbilityScores.Wisdom;
-    statsObject.Skills.Survival =  statsObject.AbilityScores.Wisdom;
-    
-    statsObject.Skills.Deception =  statsObject.AbilityScores.Charisma;
-    statsObject.Skills.Intimidation =  statsObject.AbilityScores.Charisma;
-    statsObject.Skills.Performance =  statsObject.AbilityScores.Charisma;
-    statsObject.Skills.Persuasion =  statsObject.AbilityScores.Charisma;
-
-    bot.sendMessage({
-        to: channelID,
-        message: JSON.stringify(statsObject, null, 4) + '\n <@' + userID + '>'
-    });
 }
 
-function apiCallSavingThrows(channelID, userID, className){
+function apiCallClass(channelID, userID, className, statsObject){
     axios.get('https://www.dnd5eapi.co/api/classes/' + className)
         .then(res => {
             var returnMessage = "";
@@ -186,14 +151,11 @@ function apiCallSavingThrows(channelID, userID, className){
     for (var i = 0; i < stLen; i++) {
         returnMessage = returnMessage + getBonuses(savingThrowsInfo[i].name)
 }
+    statsObject.classMessage = returnMessage;
+apiCallRace(channelID, userID, statsObject.Race, statsObject)
+            })}
 
-
-            bot.sendMessage({
-                to: channelID,
-                message: JSON.stringify(returnMessage, null, 4) + " <@" + userID + ">",
-            })})}
-
-function apiCallRace(channelID, userID, raceName){
+function apiCallRace(channelID, userID, raceName, statsObject){
     axios.get('https://www.dnd5eapi.co/api/races/' + raceName)
         .then(res => {
             var returnMessage = "";
@@ -203,10 +165,10 @@ function apiCallRace(channelID, userID, raceName){
                 returnMessage = returnMessage + ability_bonuses[i].bonus + " "
                 returnMessage = returnMessage + getBonuses(ability_bonuses[i].ability_score.name)
 }
-
+statsObject.raceMessage = returnMessage; 
             bot.sendMessage({
                 to: channelID,
-                message: JSON.stringify(returnMessage, null, 4) + " <@" + userID + ">",
+                message: JSON.stringify(statsObject, null, 4) + " <@" + userID + ">",
             })})}   
 
             function getBonuses(statType){
@@ -235,3 +197,38 @@ function apiCallRace(channelID, userID, raceName){
  }
             }
 
+function calcSkills(statsObject){
+    statsObject.Skills.Athletics =  statsObject.AbilityScores.Strength;
+
+    statsObject.Skills.Acrobatics =  statsObject.AbilityScores.Dexterity;
+    statsObject.Skills.SleightOfHand =  statsObject.AbilityScores.Dexterity;
+    statsObject.Skills.Stealth =  statsObject.AbilityScores.Dexterity;
+
+    statsObject.Skills.Arcana =  statsObject.AbilityScores.Intelligence;
+    statsObject.Skills.History =  statsObject.AbilityScores.Intelligence;
+    statsObject.Skills.Investigation =  statsObject.AbilityScores.Intelligence;
+    statsObject.Skills.Nature =  statsObject.AbilityScores.Intelligence;
+    statsObject.Skills.Religion =  statsObject.AbilityScores.Intelligence;
+    
+    statsObject.Skills.AnimalHandling =  statsObject.AbilityScores.Wisdom;
+    statsObject.Skills.Insight =  statsObject.AbilityScores.Wisdom;
+    statsObject.Skills.Medicine =  statsObject.AbilityScores.Wisdom;
+    statsObject.Skills.Perception =  statsObject.AbilityScores.Wisdom;
+    statsObject.Skills.Survival =  statsObject.AbilityScores.Wisdom;
+    
+    statsObject.Skills.Deception =  statsObject.AbilityScores.Charisma;
+    statsObject.Skills.Intimidation =  statsObject.AbilityScores.Charisma;
+    statsObject.Skills.Performance =  statsObject.AbilityScores.Charisma;
+    statsObject.Skills.Persuasion =  statsObject.AbilityScores.Charisma;
+    return statsObject
+}
+
+function calcSavingThrows(statsObject){
+    statsObject.AbilityScores.Strength = calcAbility(statsObject.BaseStats.Strength);
+    statsObject.AbilityScores.Dexterity = calcAbility(statsObject.BaseStats.Dexterity);
+    statsObject.AbilityScores.Constitution = calcAbility(statsObject.BaseStats.Constitution);
+    statsObject.AbilityScores.Intelligence = calcAbility(statsObject.BaseStats.Intelligence);
+    statsObject.AbilityScores.Wisdom = calcAbility(statsObject.BaseStats.Wisdom);
+    statsObject.AbilityScores.Charisma = calcAbility(statsObject.BaseStats.Charisma);
+    return statsObject
+}
