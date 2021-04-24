@@ -1,5 +1,7 @@
+const Discord = require('discord.io');
 var logger = require('winston');
 var axios = require('axios');
+require('dotenv').config();
 var classes = {}; 
 var races = {};
 apiCallClasses();
@@ -12,9 +14,11 @@ logger.add(new logger.transports.Console, {
 });
 logger.level = 'debug';
 
-const Discord = require('discord.js');
-const bot = new Discord.Client();
-require('dotenv').config();
+var bot = new Discord.Client({
+    token: process.env.BOT_TOKEN,
+    autorun: true
+});
+
 bot.on('ready', function (evt) {
     logger.info('Connected');
 });
@@ -404,6 +408,3 @@ function validateRace(raceName){
     if (raceFound != null){return true;}
     else {return false;}
 }
-
-
-bot.login(process.env.BOT_TOKEN);
