@@ -52,7 +52,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 });
                 break;
             case 'add':
-                var number= addFive(args[1]); 
+                var number = addFive(args[1]); 
                 bot.sendMessage({
                         to: channelID,
                         message: number + '\n <@' + userID + '>'
@@ -107,11 +107,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 var item = races.results[Math.floor(Math.random() * races.count)];
                 bot.sendMessage({
                     to: channelID,
-                    message: JSON.stringify(item, null, 4) + '\n <@' + userID + '>'
+                    message: JSON.stringify(item.name, null, 4) + '\n <@' + userID + '>'
                 });
                 break;
             case 'class':
                 var item = classes.results[Math.floor(Math.random() * classes.count)];
+                bot.sendMessage({
+                    to: channelID,
+                    message: JSON.stringify(item.name, null, 4) + '\n <@' + userID + '>'
+                });
+                break;
+            case 'diceroll':
+                var item = Math.floor(Math.random() * args[1]) + 1
                 bot.sendMessage({
                     to: channelID,
                     message: JSON.stringify(item, null, 4) + '\n <@' + userID + '>'
@@ -141,7 +148,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         case '!add':
                             bot.sendMessage({
                                 to: channelID,
-                                message: "```Example: !add 5.```" + '\n <@' + userID + '>'
+                                message: "```If any random number is sent, will add by 5. \n Example: !add 5.```" + '\n <@' + userID + '>'
                             });
                             break;
                         case '!ping':
@@ -159,6 +166,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     message: "```send in !help ![command] for specifics on each one \n !stats \n !classes \n !races \n !add \n !ping```"
                 });
                 break;
+                
          }}
      }
 });
