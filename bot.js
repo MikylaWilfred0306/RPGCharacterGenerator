@@ -130,25 +130,25 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         case '!stats':
                             bot.sendMessage({
                                 to: channelID,
-                                message: "```Generates stats for race and class provided. Race and/or class will be randomly generated if not provided. \n Send in !stats -[class] -[race] to generate random stats for a character. ```" + '\n <@' + userID + '>'
+                                message: "```When !stats -class [classname] -race [racename] is sent, random stats will be generated for the character. \n Example: !stats -class bard -race human``` \n *If no class name or race name are sent, they will be randomized.*" + '\n <@' + userID + '>'
                             });
                             break;
                         case '!class':
                             bot.sendMessage({
                                 to: channelID,
-                                message: "```Sends in random class.```" + '\n <@' + userID + '>'
+                                message: "```When !class is sent, a random class will be returned.```" + '\n <@' + userID + '>'
                             });
                             break;
                         case '!race':
                             bot.sendMessage({
                                 to: channelID,
-                                message: "```Sends in random race.```" + '\n <@' + userID + '>'
+                                message: "```When !race is sent, a random race will be returned.```" + '\n <@' + userID + '>'
                             });
                             break;
                         case '!add':
                             bot.sendMessage({
                                 to: channelID,
-                                message: "```If any random number is sent, will add by 5. \n Example: !add 5.```" + '\n <@' + userID + '>'
+                                message: "```When any random number is sent, that number added by 5 will be returned. \n Example: !add 5.```" + '\n <@' + userID + '>'
                             });
                             break;
                         case '!ping':
@@ -157,13 +157,19 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 message: "```Pong!```" + '\n <@' + userID + '>'
                             });
                             break;
+                        case '!diceroll':
+                        bot.sendMessage({
+                            to: channelID,
+                            message: "```Type !diceroll[4, 6, 8, 10, 12, 20] \n Example: !diceroll 12```" + '\n <@' + userID + '>'
+                        });
+                        break;
 
                     }
                 }
                 else{
                 bot.sendMessage({
                     to: channelID,
-                    message: "```send in !help ![command] for specifics on each one \n !stats \n !classes \n !races \n !add \n !ping```"
+                    message: "```send in !help ![command] for specifics on each command \n !stats \n !class \n !race \n !add \n !ping \n !diceroll \n Example: !help !stats ```"
                 });
                 break;
                 
